@@ -8,8 +8,10 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QMessageBox>
+#ifndef __APPLE__
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
+#endif
 #include <QPainter>
 #include <QScreen>
 #include <QStringList>
@@ -98,6 +100,7 @@ void EmuThread::run() {
 #endif
 }
 
+#ifndef __APPLE__
 class OpenGLSharedContext : public Core::Frontend::GraphicsContext {
 public:
     /// Create the original context that should be shared from
@@ -180,6 +183,7 @@ private:
     QSurface* surface;
     bool is_current = false;
 };
+#endif
 
 class DummyContext : public Core::Frontend::GraphicsContext {};
 
@@ -209,6 +213,7 @@ private:
     GRenderWindow* render_window;
 };
 
+#ifndef __APPLE__
 class OpenGLRenderWidget : public RenderWidget {
 public:
     explicit OpenGLRenderWidget(GRenderWindow* parent) : RenderWidget(parent) {
@@ -234,6 +239,7 @@ public:
 private:
     std::unique_ptr<Core::Frontend::GraphicsContext> context{};
 };
+#endif
 
 #ifdef HAS_VULKAN
 class VulkanRenderWidget : public RenderWidget {
@@ -249,6 +255,8 @@ static Core::Frontend::WindowSystemType GetWindowSystemType() {
     QString platform_name = QGuiApplication::platformName();
     if (platform_name == QStringLiteral("windows"))
         return Core::Frontend::WindowSystemType::Windows;
+    else if (platform_name == QStringLiteral("cocoa"))
+        return Core::Frontend::WindowSystemType::MacOS;
     else if (platform_name == QStringLiteral("xcb"))
         return Core::Frontend::WindowSystemType::X11;
     else if (platform_name == QStringLiteral("wayland"))
@@ -470,6 +478,7 @@ void GRenderWindow::resizeEvent(QResizeEvent* event) {
 }
 
 std::unique_ptr<Core::Frontend::GraphicsContext> GRenderWindow::CreateSharedContext() const {
+#ifndef __APPLE__
     if (Settings::values.renderer_backend == Settings::RendererBackend::OpenGL) {
         auto c = static_cast<OpenGLSharedContext*>(main_context.get());
         // Bind the shared contexts to the main surface in case the backend wants to take over
@@ -477,6 +486,7 @@ std::unique_ptr<Core::Frontend::GraphicsContext> GRenderWindow::CreateSharedCont
         return std::make_unique<OpenGLSharedContext>(c->GetShareContext(),
                                                      child_widget->windowHandle());
     }
+#endif
     return std::make_unique<DummyContext>();
 }
 
@@ -527,7 +537,9 @@ void GRenderWindow::ReleaseRenderTarget() {
         child_widget->deleteLater();
         child_widget = nullptr;
     }
+#ifndef __APPLE__
     main_context.reset();
+#endif
 }
 
 void GRenderWindow::CaptureScreenshot(u32 res_scale, const QString& screenshot_path) {
@@ -557,6 +569,7 @@ void GRenderWindow::OnMinimalClientAreaChangeRequest(std::pair<u32, u32> minimal
 }
 
 bool GRenderWindow::InitializeOpenGL() {
+#ifndef __APPLE__
     // TODO: One of these flags might be interesting: WA_OpaquePaintEvent, WA_NoBackground,
     // WA_DontShowOnScreen, WA_DeleteOnClose
     auto child = new OpenGLRenderWidget(this);
@@ -568,6 +581,9 @@ bool GRenderWindow::InitializeOpenGL() {
         std::make_unique<OpenGLSharedContext>(context->GetShareContext(), child->windowHandle()));
 
     return true;
+#else
+    return false;
+#endif
 }
 
 bool GRenderWindow::InitializeVulkan() {
@@ -575,7 +591,9 @@ bool GRenderWindow::InitializeVulkan() {
     auto child = new VulkanRenderWidget(this);
     child_widget = child;
     child_widget->windowHandle()->create();
+#ifndef __APPLE__
     main_context = std::make_unique<DummyContext>();
+#endif
 
     return true;
 #else

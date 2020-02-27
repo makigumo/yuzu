@@ -225,6 +225,10 @@ if (ENABLE_VULKAN)
     )
 endif()
 
+if (APPLE)
+  target_include_directories(video_core PRIVATE ../../externals/MoltenVK/include)
+endif()
+
 create_target_directory_groups(video_core)
 
 target_link_libraries(video_core PUBLIC common core)

@@ -23,6 +23,10 @@ class QKeyEvent;
 class QTouchEvent;
 class QStringList;
 
+class RenderWidget;
+class GMainWindow;
+class GRenderWindow;
+
 namespace VideoCore {
 enum class LoadCallbackStage;
 }
@@ -179,7 +183,9 @@ private:
     // Main context that will be shared with all other contexts that are requested.
     // If this is used in a shared context setting, then this should not be used directly, but
     // should instead be shared from
+#ifndef __APPLE__
     std::shared_ptr<Core::Frontend::GraphicsContext> main_context;
+#endif
 
     /// Temporary storage of the screenshot taken
     QImage screenshot_image;

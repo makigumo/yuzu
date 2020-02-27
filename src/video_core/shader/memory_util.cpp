@@ -66,7 +66,7 @@ ProgramCode GetShaderCode(Tegra::MemoryManager& memory_manager, GPUVAddr gpu_add
 
 u64 GetUniqueIdentifier(Tegra::Engines::ShaderType shader_type, bool is_a, const ProgramCode& code,
                         const ProgramCode& code_b) {
-    u64 unique_identifier = boost::hash_value(code);
+    std::size_t unique_identifier = boost::hash_value(code);
     if (is_a) {
         // VertexA programs include two programs
         boost::hash_combine(unique_identifier, boost::hash_value(code_b));

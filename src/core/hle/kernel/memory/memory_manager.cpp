@@ -105,7 +105,7 @@ ResultCode MemoryManager::Allocate(PageLinkedList& page_list, std::size_t num_pa
     auto group_guard = detail::ScopeExit([&] {
         for (const auto& it : page_list.Nodes()) {
             const auto min_num_pages{std::min(
-                it.GetNumPages(), (chosen_manager.GetEndAddress() - it.GetAddress()) / PageSize)};
+                it.GetNumPages(), static_cast<std::size_t>((chosen_manager.GetEndAddress() - it.GetAddress()) / PageSize))};
             chosen_manager.Free(it.GetAddress(), min_num_pages);
         }
     });
@@ -166,7 +166,7 @@ ResultCode MemoryManager::Free(PageLinkedList& page_list, std::size_t num_pages,
     // Free all of the pages
     for (const auto& it : page_list.Nodes()) {
         const auto min_num_pages{std::min(
-            it.GetNumPages(), (chosen_manager.GetEndAddress() - it.GetAddress()) / PageSize)};
+            it.GetNumPages(), static_cast<std::size_t>((chosen_manager.GetEndAddress() - it.GetAddress()) / PageSize))};
         chosen_manager.Free(it.GetAddress(), min_num_pages);
     }
 
