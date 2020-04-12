@@ -428,6 +428,15 @@ void Module::Interface::GetProfileEditor(Kernel::HLERequestContext& ctx) {
     rb.PushIpcInterface<IProfileEditor>(user_id, *profile_manager);
 }
 
+void Module::Interface::ListOpenContextStoredUsers(Kernel::HLERequestContext& ctx) {
+    LOG_WARNING(Service_ACC, "(STUBBED) called");
+    Account::UserIDArray users;
+    ctx.WriteBuffer(users);
+    IPC::ResponseBuilder rb{ctx, 2};
+    rb.Push(RESULT_SUCCESS);
+//    rb.PushRaw<u128>(Common::INVALID_UUID);
+}
+
 void Module::Interface::TrySelectUserWithoutInteraction(Kernel::HLERequestContext& ctx) {
     LOG_DEBUG(Service_ACC, "called");
     // A u8 is passed into this function which we can safely ignore. It's to determine if we have
