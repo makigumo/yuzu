@@ -19,6 +19,7 @@ private:
     void StartMonitoring(Kernel::HLERequestContext& ctx);
     void Socket(Kernel::HLERequestContext& ctx);
     void Select(Kernel::HLERequestContext& ctx);
+    void Poll(Kernel::HLERequestContext& ctx);
     void Bind(Kernel::HLERequestContext& ctx);
     void Connect(Kernel::HLERequestContext& ctx);
     void Listen(Kernel::HLERequestContext& ctx);

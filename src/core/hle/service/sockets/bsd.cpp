@@ -52,6 +52,16 @@ void BSD::Select(Kernel::HLERequestContext& ctx) {
     rb.Push<u32>(0); // bsd errno
 }
 
+void BSD::Poll(Kernel::HLERequestContext& ctx) {
+    //LOG_WARNING(Service, "(STUBBED) called");
+
+    IPC::ResponseBuilder rb{ctx, 4};
+
+    rb.Push(RESULT_SUCCESS);
+    rb.Push<u32>(0); // ret
+    rb.Push<u32>(0); // bsd errno
+}
+
 void BSD::Bind(Kernel::HLERequestContext& ctx) {
     LOG_WARNING(Service, "(STUBBED) called");
 
@@ -121,7 +131,7 @@ BSD::BSD(const char* name) : ServiceFramework(name) {
         {3, nullptr, "SocketExempt"},
         {4, nullptr, "Open"},
         {5, &BSD::Select, "Select"},
-        {6, nullptr, "Poll"},
+        {6, &BSD::Poll, "Poll"},
         {7, nullptr, "Sysctl"},
         {8, nullptr, "Recv"},
         {9, nullptr, "RecvFrom"},
