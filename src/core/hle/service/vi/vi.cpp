@@ -1213,6 +1213,20 @@ private:
         }
     }
 
+    void GetIndirectLayerImageRequiredMemoryInfo(Kernel::HLERequestContext& ctx) {
+        IPC::RequestParser rp{ctx};
+
+        const auto width = rp.PopRaw<s64>();
+        const auto height = rp.PopRaw<s64>();
+
+        LOG_WARNING(Service_VI, "(STUBBED) called width={}, height={}", width, height);
+
+        IPC::ResponseBuilder rb{ctx, 6};
+        rb.Push(RESULT_SUCCESS);
+        rb.PushRaw<s64>(width * height * 8); // buffer size for ImageMap cmds
+        rb.PushRaw<s64>(0); // buffer address alignment
+    }
+
     std::shared_ptr<NVFlinger::NVFlinger> nv_flinger;
 };
 
@@ -1239,7 +1253,8 @@ IApplicationDisplayService::IApplicationDisplayService(
         {2102, &IApplicationDisplayService::ConvertScalingMode, "ConvertScalingMode"},
         {2450, nullptr, "GetIndirectLayerImageMap"},
         {2451, nullptr, "GetIndirectLayerImageCropMap"},
-        {2460, nullptr, "GetIndirectLayerImageRequiredMemoryInfo"},
+        {2460, &IApplicationDisplayService::GetIndirectLayerImageRequiredMemoryInfo,
+         "GetIndirectLayerImageRequiredMemoryInfo"},
         {5202, &IApplicationDisplayService::GetDisplayVsyncEvent, "GetDisplayVsyncEvent"},
         {5203, nullptr, "GetDisplayVsyncEventForDebug"},
     };
